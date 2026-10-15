@@ -1,16 +1,59 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Una cita y una lectura propia · KeepAnalog</title><meta name="description" content="Conservá por separado las palabras de una fuente y tu interpretación, con una copia descargable en JSON."><meta name="robots" content="index,follow"><link rel="canonical" href="https://edutormakh1.github.io/keepanalog-fuente-y-cita/">
-<style>:root{font:16px/1.55 system-ui,sans-serif;color:#2b2b24;background:#f4f0e7}*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:auto;padding:30px 24px 60px}header{display:flex;gap:20px;justify-content:space-between;border-bottom:1px solid #d3d1c7;padding-bottom:18px}a{color:#476147;text-underline-offset:4px}h1{font:clamp(34px,6vw,54px)/1.12 Georgia,serif;max-width:700px}h2{font:27px/1.2 Georgia,serif}label{display:block;font-weight:600;margin:16px 0 5px}input,textarea{width:100%;font:inherit;border:1px solid #b9beb2;background:white;border-radius:6px;padding:10px}textarea{min-height:130px;resize:vertical}.columns{display:grid;grid-template-columns:1fr 1fr;gap:22px}.box{padding:22px;background:#fffdf8;border:1px solid #d3d1c7;border-radius:9px}.quote{border-top:5px solid #6b7960}.own{border-top:5px solid #b18862}.note{font-size:14px;color:#606454}button{font:inherit;padding:11px 18px;background:#476147;color:white;border:1px solid #476147;border-radius:6px;cursor:pointer;margin:15px 8px 0 0}button:disabled{opacity:.5;cursor:default}button.secondary{color:#476147;background:transparent}input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #b18862;outline-offset:3px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fffdf8;border:1px solid #d3d1c7;padding:20px;font-size:14px}footer{border-top:1px solid #d3d1c7;margin-top:35px;padding-top:20px;font-size:14px}footer a{margin-right:18px}@media(max-width:700px){.columns{grid-template-columns:1fr}.box{padding:17px}}@media print{button{display:none}main{padding:0}.columns{grid-template-columns:1fr}}</style>
-</head><body><main><header><strong>KeepAnalog · Herramientas de lectura</strong><a href="https://www.keepanalog.com/blog">Guías de KeepAnalog</a></header>
-<h1>Una cita y una lectura propia</h1><p>Al guardar un pasaje, también podés querer anotar qué pensaste al leerlo. Esta herramienta conserva esas dos cosas en campos distintos para que, cuando vuelvas, puedas reconocer qué palabras vienen de la fuente.</p>
-<p>Copiá sólo el fragmento que necesitás, identificá de dónde viene y escribí tu comentario con tus palabras. La copia descargada es un archivo de texto en formato JSON: podés abrirlo con un editor para revisarlo después.</p>
-<form id="ficha"><div class="columns"><section class="box quote"><h2>Lo que dice la fuente</h2><label for="cita">Pasaje citado</label><textarea id="cita" name="cita" required placeholder="Conservá las palabras tal como aparecen en la fuente."></textarea><label for="referencia">Título y referencia</label><input id="referencia" name="referencia" required placeholder="Título, autor o entidad, página o apartado"><label for="enlace">Enlace a la fuente</label><input id="enlace" name="enlace" type="url" required placeholder="https://..."><p class="note">Si falta un dato, anotá que no está indicado. Comprobá el pasaje contra la fuente antes de compartirlo.</p></section>
-<section class="box own"><h2>Lo que pienso al leer</h2><label for="comentario">Mi interpretación</label><textarea id="comentario" name="comentario" required placeholder="¿Cómo entiendo este pasaje?"></textarea><label for="pregunta">Qué quiero revisar</label><textarea id="pregunta" name="pregunta" placeholder="Una pregunta para la próxima lectura."></textarea><p class="note">Este campo es tu lectura: no se atribuye al autor del pasaje.</p></section></div><button type="submit">Preparar mi copia</button><button type="button" class="secondary" id="ejemplo">Ver un ejemplo de KeepAnalog</button></form>
-<section><h2>Tu copia</h2><pre id="resultado">La copia aparecerá acá.</pre><button id="descargar" disabled type="button">Descargar JSON</button><p id="status" role="status" aria-live="polite"></p><p class="note">El código de esta herramienta procesa los campos en esta pestaña; no los envía a un servidor ni los guarda al cerrar. Descargá el archivo si querés conservarlo.</p></section>
-<section><h2>Al volver</h2><p>Abrí otra vez la fuente y preguntate si tu comentario conserva la diferencia entre el texto citado y lo que vos inferiste. Si cambió la publicación, registrá la diferencia. También podés revisar la pregunta o dejarla abierta.</p><p><a href="https://www.keepanalog.com/blog">Más recursos para retomar una lectura</a></p></section>
-<footer><p>Proyecto educativo gratuito de KeepAnalog. Eduardo y Bautista trabajan desde Argentina; la operación y los envíos actuales siguen en Argentina.</p><p><a href="https://www.keepanalog.com">KeepAnalog</a><a href="https://www.keepanalog.com/blog">Guías</a><a href="mailto:eduardo@keepanalog.com">Contacto</a></p><p class="note">Texto y código asistidos por IA y revisados. Fuente editable en el repositorio de este proyecto.</p></footer></main>
-<script>
-const form=document.querySelector('#ficha'),preview=document.querySelector('#resultado'),status=document.querySelector('#status'),download=document.querySelector('#descargar');let prepared='';
-form.addEventListener('submit',event=>{event.preventDefault();const d=Object.fromEntries(new FormData(form));let url;try{url=new URL(d.enlace);}catch{status.textContent='Revisá el enlace completo de la fuente.';return;}if(!['http:','https:'].includes(url.protocol)){status.textContent='Usá un enlace con http o https.';return;}const now=new Date();const date=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');prepared=JSON.stringify({fuente:{referencia:d.referencia.trim(),enlace:d.enlace.trim(),cita:d.cita.trim()},lectura_propia:{interpretacion:d.comentario.trim(),pregunta:d.pregunta.trim()},fecha_de_consulta:date},null,2);preview.textContent=prepared;download.disabled=false;status.textContent='Copia preparada. Revisá los dos campos antes de descargarla.';});
-document.querySelector('#ejemplo').addEventListener('click',()=>{form.elements.cita.value='Eduardo y Bautista trabajan en KeepAnalog desde Argentina.';form.elements.referencia.value='KeepAnalog: Una fuente, una ficha Markdown · pie del recurso';form.elements.enlace.value='https://keepanalog-ficha-markdown.surge.sh/';form.elements.comentario.value='Entiendo que el recurso identifica a sus responsables y el país desde el que trabajan.';form.elements.pregunta.value='¿Qué parte del recurso quiero probar en mi próxima lectura?';form.requestSubmit();});
-download.addEventListener('click',()=>{const blob=new Blob([prepared],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='cita-y-lectura-keepanalog.json';a.click();URL.revokeObjectURL(url);});
-</script></body></html>
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>El contexto de un fragmento · KeepAnalog</title>
+  <meta name="description" content="Una ficha para distinguir lo que dice un fragmento, el contexto que pudiste consultar y lo que todavía te falta revisar.">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root { color-scheme: light; font-family: Georgia, serif; color: #24382c; background: #f7f5ee; }
+    body { margin: 0; line-height: 1.65; }
+    main { max-width: 720px; margin: auto; padding: 48px 24px; }
+    h1 { font-size: clamp(2rem, 7vw, 3.5rem); line-height: 1.12; }
+    h2 { margin-top: 2rem; line-height: 1.3; }
+    a { color: #185d40; text-underline-offset: 3px; }
+    .brand, footer, label, .hint { font-family: system-ui, sans-serif; }
+    .brand { letter-spacing: .08em; text-transform: uppercase; font-size: .85rem; }
+    section { border-top: 1px solid #c7cfc3; margin-top: 32px; padding-top: 8px; }
+    label { display: block; font-weight: 600; margin-top: 20px; }
+    textarea { box-sizing: border-box; width: 100%; min-height: 92px; padding: 12px; font: inherit; background: #fffdf8; border: 1px solid #899a89; border-radius: 4px; color: inherit; }
+    .hint, footer { font-size: .88rem; }
+    footer { border-top: 1px solid #c7cfc3; margin-top: 40px; padding-top: 20px; }
+    @media print { main { padding: 0; } body { background: white; } textarea { min-height: 64px; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="brand">KeepAnalog · Fichas para volver a leer</p>
+  <h1>El contexto de un fragmento</h1>
+  <p>Una frase guardada puede ayudarte a volver a una lectura. Para interpretarla, también necesitás recordar qué parte de la fuente pudiste consultar. Esta ficha te propone separar la observación, el contexto y una pregunta pendiente.</p>
+  <section>
+    <h2>1. Ubicá la fuente</h2>
+    <p>Anotá título, autor o entidad, enlace y fecha de consulta. Si llegaste desde una captura, un resumen o una publicación que cita otra fuente, dejalo escrito. Haber visto una cita no equivale a haber consultado el documento de origen.</p>
+    <label for="fuente">Fuente y lugar del fragmento</label>
+    <textarea id="fuente" placeholder="Título, enlace, fecha y página o subtítulo"></textarea>
+  </section>
+  <section>
+    <h2>2. Describí lo que sí viste</h2>
+    <p>Revisá, si están disponibles, el párrafo anterior y el siguiente. Mirá a quién se refiere la afirmación y si incluye condiciones, ejemplos o excepciones. Si no pudiste abrir la fuente completa, registrá esa limitación.</p>
+    <p>Conservá cualquier cita breve separada de tu explicación. Tus palabras pueden resumir una idea; las comillas indican que intentás reproducir palabras de otra persona.</p>
+    <label for="contexto">Contexto consultado e interpretación provisional</label>
+    <textarea id="contexto" placeholder="Pude consultar… Por ahora entiendo…"></textarea>
+  </section>
+  <section>
+    <h2>3. Dejá una pregunta que puedas retomar</h2>
+    <p>Elegí una duda concreta: ¿la frase describe un caso o propone una regla?, ¿se refiere a una fecha específica?, ¿qué referencia tendría que abrir para entenderla mejor? No completes una ausencia de información con una certeza.</p>
+    <p><strong>Ejemplo ficticio:</strong> un fragmento dice que se puede guardar una página sin conexión. Mi pregunta pendiente es si esa copia incluye los archivos enlazados. Antes de depender de ella, consultaré la ayuda oficial del navegador.</p>
+    <label for="pregunta">Pregunta pendiente y próximo paso</label>
+    <textarea id="pregunta" placeholder="Quiero comprobar… La fuente que revisaré es…"></textarea>
+  </section>
+  <p class="hint">Los campos son una ayuda de escritura. Este sitio no guarda ni envía tus notas. Copialas a tu archivo antes de salir, o usá Imprimir en tu navegador para conservar una ficha.</p>
+  <p>Podés continuar con las <a href="https://www.keepanalog.com/blog">guías de lectura de KeepAnalog</a>.</p>
+  <footer>
+    <p>Recurso de <a href="https://www.keepanalog.com">KeepAnalog</a>. Contacto: eduardo@keepanalog.com.</p>
+    <p>Eduardo y Bautista trabajan desde Argentina. La operación y los envíos actuales siguen en Argentina. Estados Unidos es preparación futura. Texto asistido por IA y revisado.</p>
+  </footer>
+</main>
+</body>
+</html>
